@@ -1,6 +1,5 @@
 package org.opengis.cite.gpkg12.extensions.relatedtables;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import static org.testng.Assert.assertTrue;
 
@@ -14,7 +13,6 @@ import org.opengis.cite.gpkg12.CommonFixture;
 import org.opengis.cite.gpkg12.ErrorMessage;
 import org.opengis.cite.gpkg12.ErrorMessageKeys;
 import org.opengis.cite.gpkg12.util.DatabaseUtility;
-import org.testng.Assert;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import org.testng.ITestContext;
@@ -136,7 +134,7 @@ public class RelatedTablesTests extends CommonFixture {
             }
             assertTrue((passFlag & flagMask) == flagMask, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_EXTENSION_ROWS_MISSING, String.format("Missing row flag %d", passFlag)));
         }
-                
+
         assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkgext_relations"), ErrorMessage.format(ErrorMessageKeys.MISSING_TABLE, "gpkgext_relations"));
         List<String> mappingTables = getRowsForRelationColumn("mapping_table_name");
         for (String mappingTable : mappingTables) {
@@ -277,8 +275,7 @@ public class RelatedTablesTests extends CommonFixture {
     private List<Integer> getBaseIdsForMappingTable(final String mapping_table_name) throws SQLException {
         return getIdsForMappingTable("base_id", mapping_table_name);
     }
-    
-    
+
     private List<Integer> getRelatedIdsForMappingTable(final String mapping_table_name) throws SQLException {
         return getIdsForMappingTable("related_id", mapping_table_name);
     }
@@ -294,7 +291,7 @@ public class RelatedTablesTests extends CommonFixture {
         }
         return rows;
     }
-    
+
     private List<Integer> getIntegerValues(final String base_table_name, final String base_primary_column) throws SQLException {
         List<Integer> rows = new ArrayList<>();
         try (
@@ -306,13 +303,13 @@ public class RelatedTablesTests extends CommonFixture {
         }
         return rows;
     }
-    
+
     private void check_mapping_table_base_ids(final String mapping_table_name, final String base_table_name, final String base_primary_column) throws SQLException {
         assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, mapping_table_name), ErrorMessage.format(ErrorMessageKeys.MISSING_TABLE, mapping_table_name));
         assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, base_table_name), ErrorMessage.format(ErrorMessageKeys.MISSING_TABLE, base_table_name));
         List<Integer> mappingTableIds = getBaseIdsForMappingTable(mapping_table_name);
         List<Integer> baseIds = getIntegerValues(base_table_name, base_primary_column);
-        
+
         for (int mappingTableId : mappingTableIds) {
             assertTrue(baseIds.contains(mappingTableId), ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_BASE_ROW_INVALID, mapping_table_name, mappingTableId));
         }
@@ -323,7 +320,7 @@ public class RelatedTablesTests extends CommonFixture {
         assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, related_table_name), ErrorMessage.format(ErrorMessageKeys.MISSING_TABLE, related_table_name));
         List<Integer> mappingTableIds = getRelatedIdsForMappingTable(mapping_table_name);
         List<Integer> relatedIds = getIntegerValues(related_table_name, related_primary_column);
-        
+
         for (int mappingTableId : mappingTableIds) {
             assertTrue(relatedIds.contains(mappingTableId), ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_RELATED_ROW_INVALID, mapping_table_name, mappingTableId));
         }
@@ -352,7 +349,7 @@ public class RelatedTablesTests extends CommonFixture {
                 final String base_table_name = resultSet.getString("base_table_name");
                 final String base_primary_column = resultSet.getString("base_primary_column");
                 final String mapping_table_name = resultSet.getString("mapping_table_name");
-                
+
                 check_mapping_table_base_ids(mapping_table_name, base_table_name, base_primary_column);
                 check_is_pk(base_table_name, base_primary_column);
             }
@@ -377,7 +374,7 @@ public class RelatedTablesTests extends CommonFixture {
                 final String related_table_name = resultSet.getString("related_table_name");
                 final String related_primary_column = resultSet.getString("related_primary_column");
                 final String mapping_table_name = resultSet.getString("mapping_table_name");
-                
+
                 check_mapping_table_related_ids(mapping_table_name, related_table_name, related_primary_column);
                 check_is_pk(related_table_name, related_primary_column);
             }
@@ -400,7 +397,7 @@ public class RelatedTablesTests extends CommonFixture {
             assertTrue(isTableListedInContentsTableAsAttributesType(relatedTable), ErrorMessage.format(ErrorMessageKeys.MISSING_TABLE, relatedTable));
         }
     }
-    
+
     private void checkMediaTableSchema(final String mediaTable) throws SQLException {
         try (
                 final Statement statement = this.databaseConnection.createStatement();
@@ -410,7 +407,7 @@ public class RelatedTablesTests extends CommonFixture {
 
             String pk = getPrimaryKeyColumn(mediaTable);
             assertNotNull(pk, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_ATTRIBUTES_NO_PRIMARY_KEY, mediaTable));
-            
+
             while (resultSet.next()) {
                 final String name = resultSet.getString("name");
                 if ("data".equals(name)) {
@@ -426,7 +423,7 @@ public class RelatedTablesTests extends CommonFixture {
             assertTrue((passFlag & flagMask) == flagMask, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MEDIA_COLUMN_INVALID, mediaTable, "missing column(s)"));
         }
     }
-    
+
     private List<String> getRowsForRelatedMedia() throws SQLException {
         List<String> rows = new ArrayList<>();
         try (
