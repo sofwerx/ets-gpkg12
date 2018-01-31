@@ -108,4 +108,11 @@ public class ErrorMessageKeys {
     public static final String COVERAGE_ANCILLARY_DATATYPE_INVALID = "CoverageAncillaryDatatypeInvalid";
     public static final String TILE_ANCILLARY_REFERENCES = "TileAncillaryReferences";
     public static final String TILE_ANCILLARY_TABLE_REF_INVALID = "TileAncillaryTableRefInvalid";
+    public static final String RELATED_TABLES_RELATIONS_COLUMN_INVALID = "RelatedTableRelationsColumnInvalid";
+    public static final String RELATED_TABLES_MAPPING_COLUMN_INVALID = "RelatedTableMappingColumnInvalid";
+    public static final String RELATED_TABLES_RELATIONS_TABLE_NOT_IN_CONTENTS = "RelatedTableRelationsTableNotInContents";
+    public static final String RELATED_TABLES_MAPPING_BASE_ROW_INVALID = "RelatedTableMappingBaseRowInvalid";
+    public static final String RELATED_TABLES_MAPPING_RELATED_ROW_INVALID = "RelatedTableMappingRelatedRowInvalid";
+    public static final String RELATED_TABLES_ATTRIBUTES_NO_PRIMARY_KEY = "RelatedTablesAttributesNoPrimaryKey";
+    public static final String RELATED_TABLES_MEDIA_COLUMN_INVALID = "RelatedTableMediaColumnInvalid";
 }

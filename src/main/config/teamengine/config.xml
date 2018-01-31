@@ -25,6 +25,7 @@
           <conformanceClass>Schema</conformanceClass>
           <conformanceClass>WKT for Coordinate Reference Systems</conformanceClass>
           <conformanceClass>Tiled Gridded Elevation Data</conformanceClass>
+          <conformanceClass>Related Tables</conformanceClass>
         </BasicConformanceClasses>
       </suite>
       <revision>
