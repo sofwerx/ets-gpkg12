@@ -134,22 +134,22 @@ public class RelatedTablesTests extends CommonFixture {
                     }
                 }
             }
-            assertTrue((passFlag & flagMask) == flagMask, ErrorMessage.format(ErrorMessageKeys.ELEVATION_EXTENSION_ROWS_MISSING, String.format("Missing row flag %d", passFlag)));
+            assertTrue((passFlag & flagMask) == flagMask, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_EXTENSION_ROWS_MISSING, String.format("Missing row flag %d", passFlag)));
         }
-        /*
-        // TODO: we need the mapping tables first.
-        for (final String tableName : this.elevationTableNames) {
+                
+        assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkgext_relations"), ErrorMessage.format(ErrorMessageKeys.MISSING_TABLE, "gpkgext_relations"));
+        List<String> mappingTables = getRowsForRelationColumn("mapping_table_name");
+        for (String mappingTable : mappingTables) {
             try (
-                    final Statement statement1 = this.databaseConnection.createStatement();
-                    final ResultSet resultSet1 = statement1.executeQuery(String.format("SELECT column_name, definition, scope from gpkg_extensions WHERE extension_name = 'gpkg_elevation_tiles' AND table_name = '%s'", tableName));) {
-                assertTrue(resultSet1.next() && "tile_data".equals(resultSet1.getObject("column_name"))
-                        && "gpkg_elevation_tiles".equals(resultSet1.getString("extension_name"))
-                        && "http://www.geopackage.org/spec/#extension_tiled_gridded_elevation_data".equals(resultSet1.getString("definition"))
+                    final Statement stmt = this.databaseConnection.createStatement();
+                    final ResultSet resultSet1 = stmt.executeQuery(String.format("SELECT column_name, extension_name, definition, scope from gpkg_extensions WHERE extension_name = 'related_tables' AND table_name = '%s'", mappingTable));) {
+                assertTrue(resultSet1.next() && (resultSet1.getObject("column_name") == null)
+                        && "related_tables".equals(resultSet1.getString("extension_name"))
+                        && "TBD".equals(resultSet1.getString("definition"))
                         && "read-write".equals(resultSet1.getString("scope")),
-                        ErrorMessageKeys.ELEVATION_EXTENSION_ROWS_MISSING);
+                        ErrorMessageKeys.RELATED_TABLES_EXTENSION_ROWS_MISSING);
             }
         }
-         */
     }
 
     private List<String> getRowsForRelationColumn(final String column) throws SQLException {
@@ -246,7 +246,7 @@ public class RelatedTablesTests extends CommonFixture {
                 if ("base_id".equals(name)) {
                     assertEquals(resultSet.getString("type"), "INTEGER", ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_COLUMN_INVALID, mappingTable, "base_table_name type"));
                     assertTrue(resultSet.getInt("notnull") == 1, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_COLUMN_INVALID, mappingTable, "base_table_name notnull"));
-                    passFlag |= (1 << 0);
+                    passFlag |= 1;
                 } else if ("related_id".equals(name)) {
                     assertEquals(resultSet.getString("type"), "INTEGER", ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_COLUMN_INVALID, mappingTable, "base_table_name type"));
                     assertTrue(resultSet.getInt("notnull") == 1, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_COLUMN_INVALID, mappingTable, "base_table_name notnull"));
@@ -329,6 +329,11 @@ public class RelatedTablesTests extends CommonFixture {
         }
     }
 
+    private void check_is_pk(final String table_name, final String primary_column) throws SQLException {
+        String pk = getPrimaryKeyColumn(table_name);
+        assertEquals(pk, primary_column, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_NOT_PRIMARY_KEY, table_name, primary_column, pk));
+    }
+
     /**
      * Test case {@code /req/table-defs/udmt_base}
      *
@@ -349,6 +354,7 @@ public class RelatedTablesTests extends CommonFixture {
                 final String mapping_table_name = resultSet.getString("mapping_table_name");
                 
                 check_mapping_table_base_ids(mapping_table_name, base_table_name, base_primary_column);
+                check_is_pk(base_table_name, base_primary_column);
             }
         }
     }
@@ -373,6 +379,7 @@ public class RelatedTablesTests extends CommonFixture {
                 final String mapping_table_name = resultSet.getString("mapping_table_name");
                 
                 check_mapping_table_related_ids(mapping_table_name, related_table_name, related_primary_column);
+                check_is_pk(related_table_name, related_primary_column);
             }
         }
     }
@@ -448,5 +455,4 @@ public class RelatedTablesTests extends CommonFixture {
             checkMediaTableSchema(mediaTable);
         }
     }
-
 }
