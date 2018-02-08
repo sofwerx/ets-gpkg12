@@ -14,6 +14,7 @@ import org.opengis.cite.gpkg12.ErrorMessage;
 import org.opengis.cite.gpkg12.ErrorMessageKeys;
 import org.opengis.cite.gpkg12.util.DatabaseUtility;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -425,10 +426,18 @@ public class RelatedTablesTests extends CommonFixture {
     }
 
     private List<String> getRowsForRelatedMedia() throws SQLException {
+        return getRowsForRelatedTable("media");
+    }
+
+    private List<String> getRowsForRelatedSimpleAttributes() throws SQLException {
+        return getRowsForRelatedTable("simple_attributes");
+    }
+
+    private List<String> getRowsForRelatedTable(String relationName) throws SQLException {
         List<String> rows = new ArrayList<>();
         try (
                 final Statement stmt = this.databaseConnection.createStatement();
-                ResultSet resultSet = stmt.executeQuery("SELECT related_table_name FROM gpkgext_relations WHERE relation_name = 'media'")) {
+                ResultSet resultSet = stmt.executeQuery("SELECT related_table_name FROM gpkgext_relations WHERE relation_name = '" + relationName + "'")) {
             while (resultSet.next()) {
                 rows.add(resultSet.getString("related_table_name"));
             }
@@ -450,6 +459,39 @@ public class RelatedTablesTests extends CommonFixture {
         List<String> mediaTables = getRowsForRelatedMedia();
         for (String mediaTable : mediaTables) {
             checkMediaTableSchema(mediaTable);
+        }
+    }
+
+    private void checkSimpleAttributesTableSchema(final String mediaTable) throws SQLException {
+        try (
+                final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("PRAGMA table_info('" + mediaTable + "')");) {
+
+            String pk = getPrimaryKeyColumn(mediaTable);
+            assertNotNull(pk, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_ATTRIBUTES_NO_PRIMARY_KEY, mediaTable));
+
+            while (resultSet.next()) {
+                String columnName = resultSet.getString("name");
+                String columnType =  resultSet.getString("type").toUpperCase();
+                assertFalse(columnType == "BLOB" || resultSet.getString("type") == "NULL", ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_SIMPLE_ATTR_COLUMN_INVALID, mediaTable, columnName));
+            }
+        }
+    }
+
+    /**
+     * Test case {@code /req/simple_attributes/table_def}
+     *
+     * @see <a href="#14" target= "_blank">Related Tables Extension -
+     * Requirement 14</a>
+     *
+     * @throws SQLException If an SQL query causes an error
+     */
+    @Test(description = "See OGC 18-000: Requirement 14")
+    public void simple_attributes_table_def() throws SQLException {
+        assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkgext_relations"), ErrorMessage.format(ErrorMessageKeys.MISSING_TABLE, "gpkgext_relations"));
+        List<String> simpleAttributesTables = getRowsForRelatedSimpleAttributes();
+        for (String simpleAttributesTable : simpleAttributesTables) {
+            checkSimpleAttributesTableSchema(simpleAttributesTable);
         }
     }
 }
