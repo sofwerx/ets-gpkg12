@@ -163,6 +163,18 @@ public class RelatedTablesTests extends CommonFixture {
         return rows;
     }
 
+    private List<String> getRowsForRelationColumn(final String column, final String relation) throws SQLException {
+        List<String> rows = new ArrayList<>();
+        try (
+                final Statement stmt = this.databaseConnection.createStatement();
+                ResultSet resultSet = stmt.executeQuery("SELECT " + column + " FROM gpkgext_relations WHERE relation_name = '" + relation + "'")) {
+            while (resultSet.next()) {
+                rows.add(resultSet.getString(column));
+            }
+        }
+        return rows;
+    }
+
     private boolean isTableListedInContentsTable(final String tableName) throws SQLException {
         try (final PreparedStatement preparedStatement = this.databaseConnection.prepareStatement("SELECT COUNT(*) FROM gpkg_contents WHERE table_name = ? LIMIT 1;")) {
             preparedStatement.setString(1, tableName);
@@ -393,7 +405,7 @@ public class RelatedTablesTests extends CommonFixture {
     @Test(description = "See OGC 18-000: Requirement 10")
     public void is_attributes_table() throws SQLException {
         assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkgext_relations"), ErrorMessage.format(ErrorMessageKeys.MISSING_TABLE, "gpkgext_relations"));
-        List<String> relatedTables = getRowsForRelationColumn("related_table_name");
+        List<String> relatedTables = getRowsForRelationColumn("related_table_name", "media");
         for (String relatedTable : relatedTables) {
             assertTrue(isTableListedInContentsTableAsAttributesType(relatedTable), ErrorMessage.format(ErrorMessageKeys.MISSING_TABLE, relatedTable));
         }
