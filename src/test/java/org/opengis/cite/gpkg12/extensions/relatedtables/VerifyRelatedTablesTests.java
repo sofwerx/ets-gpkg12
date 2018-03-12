@@ -132,6 +132,27 @@ public class VerifyRelatedTablesTests {
     }
 
     /**
+     * Verifies that the test fails if the gpkgext_relations row has an incorrect definition in gpkg_contents.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void extensionBadInGpkgExtensions() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_related_bad_mapping_extension_row.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("Required row (gpkgext_relations - missing row flag 7) for the Related Tables Extension is missing from gpkg_extensions. expected [true] but found [false]");
+        tests.relations_table_in_extensions();
+    }
+
+
+    /**
      * Verifies that the test passes if the gpkgext_relations row is present in gpkg_extensions with the right definition.
      *
      * @throws IOException
@@ -246,4 +267,202 @@ public class VerifyRelatedTablesTests {
         thrown.expectMessage("The mapping1 table is missing. expected [true] but found [false]");
         tests.mapping_tables_in_extensions();
     }
+    
+    /**
+     * Verifies that the test passes if the gpkg_extensions table has a related table row with the right definition.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void mappingTableDefinitionInGpkgExtensions() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_related.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        tests.extension_table_rows();
+    }
+
+    /**
+     * Verifies that the test passes if the gpkg_extensions table has a related table row with the right definition.
+     *
+     * This checks the 'gpkg_related_tables' option which is available after the extension gets approved.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void mappingTableDefinitionInGpkgExtensionsAltName() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_related_altname.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        tests.extension_table_rows();
+    }
+
+    /**
+     * Verifies that the test fails if the gpkg_extensions table does not contain at least one mapping table.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void mappingTableDefinitionMissingInGpkgExtensions() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/related_missing_mapping_entry.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("Required row (at least one mapping table row) for the Related Tables Extension is missing from gpkg_extensions. expected [true] but found [false]");
+        tests.extension_table_rows();
+    }
+    
+    /**
+     * Verifies that the test fails if the gpkg_extensions table contains a mapping table row with the wrong definition
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void mappingTableDefinitionBadInGpkgExtensions() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_related_bad_mapping_extension_row.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("Required row (mapping1 - missing row flag 3) for the Related Tables Extension is missing from gpkg_extensions. expected [true] but found [false]");
+        tests.extension_table_rows();
+    }
+    
+    /**
+     * Verifies that the test passes if the gpkgext_relations table is present and has the right definition.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void relationsTableValid() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_related.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        tests.relations_table_definition();
+    }
+    
+    /**
+     * Verifies that the test fails if the gpkgext_relations table is missing
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void relationsTableMissing() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/related_missing_gpkgext_relations.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("The gpkgext_relations table is missing. expected [true] but found [false]");
+        tests.relations_table_definition();
+    }
+    
+    // TODO: unit test for relations table present with bad definition.
+    
+    /**
+     * Verifies that the test passes if the base table is in the database.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void baseTableValid() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_related.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        tests.base_tables();
+    }
+    
+    // TODO: base table not found in database
+ 
+    /**
+     * Verifies that the test passes if the base table is in contents.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void baseTableValidContents() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_related.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        tests.base_tables_contents();
+    }
+    
+    // TODO: base table not found in contents
+    
+    /**
+     * Verifies that the test passes if the related table is in the database.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void relatedTableValid() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_related.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        tests.related_tables();
+    }
+    
+    // TODO: related table not found in database
+ 
+    /**
+     * Verifies that the test passes if the related table is in contents.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void relatedTableValidContents() throws IOException, SQLException, URISyntaxException  {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/simple_related.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        tests.related_tables_contents();
+    }
+    
+    // TODO: related table not found in contents
 }
