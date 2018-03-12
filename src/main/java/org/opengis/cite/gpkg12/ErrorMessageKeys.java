@@ -115,6 +115,7 @@ public class ErrorMessageKeys {
     public static final String RELATED_TABLES_MAPPING_RELATED_ROW_INVALID = "RelatedTableMappingRelatedRowInvalid";
     public static final String RELATED_TABLES_ATTRIBUTES_NO_PRIMARY_KEY = "RelatedTablesAttributesNoPrimaryKey";
     public static final String RELATED_TABLES_MEDIA_COLUMN_INVALID = "RelatedTableMediaColumnInvalid";
+    public static final String RELATED_TABLES_EXTENSION_ROW_MISSING = "RelatedTablesExtensionRowMissing";
     public static final String RELATED_TABLES_EXTENSION_ROWS_MISSING = "RelatedTablesExtensionRowsMissing";
     public static final String RELATED_TABLES_NOT_PRIMARY_KEY = "RelatedTableNotPrimaryKey";
     public static final String RELATED_TABLES_SIMPLE_ATTR_COLUMN_INVALID = "RelatedTableSimpleAttrColumnInvalid";

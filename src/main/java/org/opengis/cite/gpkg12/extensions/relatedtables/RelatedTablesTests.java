@@ -35,25 +35,85 @@ import org.testng.annotations.Test;
  */
 public class RelatedTablesTests extends CommonFixture {
 
+    /**
+     * Test case {@code /conf/table-defs/applicability}
+     *
+     * Verify whether the Related Tables Extension is applicable.
+     *
+     * @param testContext test context provided by calling test harness.
+     *
+     * @throws SQLException If an SQL query causes an error
+     */
     @BeforeClass
     public void activeExtension(ITestContext testContext) throws SQLException {
         assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, "gpkg_extensions"), ErrorMessage.format(ErrorMessageKeys.CONFORMANCE_CLASS_NOT_USED, "Related Tables Extension"));
         try (
                 final Statement statement = this.databaseConnection.createStatement();
-                final ResultSet resultSet = statement.executeQuery("SELECT count(*) from gpkg_extensions WHERE extension_name = 'related_tables';");) {
+                final ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM gpkg_extensions WHERE extension_name IN ('related_tables', 'gpkg_related_tables')");) {
             resultSet.next();
-            assertTrue(resultSet.getInt(1) > 0, ErrorMessage.format(ErrorMessageKeys.CONFORMANCE_CLASS_NOT_USED, "Related Tables Extension"));
+            assertTrue(resultSet.getInt(1) != 0, ErrorMessage.format(ErrorMessageKeys.CONFORMANCE_CLASS_NOT_USED, "Related Tables Extension"));
         }
     }
 
     /**
-     * Test case {@code /req/table-defs/ger}
+     * Test case {@code /conf/table-defs/ger}
      *
-     * @see <a href="#2" target= "_blank">Related Tables Extension - Requirement
-     * 3</a>
+     * Verify that the gpkgext_relations table is listed in the gpkg_extensions table
      *
      * @throws SQLException If an SQL query causes an error
      */
+    @Test(description = "See OGC 18-000: Requirement 1")
+    public void relations_table_in_extensions() throws SQLException {
+        try (
+                final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT * FROM gpkg_extensions WHERE table_name = 'gpkgext_relations'");) {
+            int passFlag = 0;
+            final long flagMask = 0b1111;
+            if (resultSet.next()) {
+                if (resultSet.getObject("column_name") == null) {
+                    passFlag |=1;
+                }
+                if ("related_tables".equals(resultSet.getString("extension_name")) || ("gpkg_related_tables".equals(resultSet.getString("extension_name")))) {
+                    passFlag |= (1 << 1);
+                }
+                if ("TBD".equals(resultSet.getString("definition"))) {
+                    passFlag |= (1 << 2);
+                }
+                if ("read-write".equals(resultSet.getString("scope"))) {
+                    passFlag |= (1 << 3);
+                }
+                assertTrue((passFlag & flagMask) == flagMask, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_EXTENSION_ROW_MISSING, String.format("gpkgext_relations - missing row flag %d", passFlag)));
+            } else {
+                assertTrue(false, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_EXTENSION_ROW_MISSING, "gpkgext_relations"));
+            }
+        }
+    }
+
+    /**
+     * Test case {@code /conf/table-defs/extensions-gerr}
+     *
+     * Verify that the gpkg_extensions table contains at least one user defined mapping table.
+     *
+     * @throws SQLException If an SQL query causes an error
+     */
+    @Test(description = "See OGC 18-000: Requirement 2")
+    public void mapping_tables_in_extensions() throws SQLException {
+        try (
+                final Statement statement = this.databaseConnection.createStatement();
+                final ResultSet resultSet = statement.executeQuery("SELECT table_name FROM gpkg_extensions WHERE (extension_name IN ('related_tables', 'gpkg_related_tables') AND table_name != 'gpkgext_relations')");) {
+            int numRows = 0;
+            while (resultSet.next()) {
+                numRows++;
+                final String table_name = resultSet.getString("table_name");
+                assertTrue(DatabaseUtility.doesTableOrViewExist(this.databaseConnection, table_name), ErrorMessage.format(ErrorMessageKeys.MISSING_TABLE, table_name));
+            }
+            if (numRows == 0) {
+                assertTrue(false, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_EXTENSION_ROW_MISSING, "at least one mapping table row"));
+            }
+        }
+    }
+
+    // TODO: everything after this is untested junk.
     @Test(description = "See OGC 18-000: Requirement 3")
     public void relations_table_definition() throws SQLException {
 
