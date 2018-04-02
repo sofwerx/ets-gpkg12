@@ -776,7 +776,48 @@ public class VerifyRelatedTablesTests {
         tests.mapping_tables_schema();
     }
 
-    // TODO: bad nullability
+    /**
+     * Verifies that the test fails if the mapping table has the wrong base_id
+     * column nullability.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void relatedTableInvalidMappingTableSchemaBaseColNull() throws IOException, SQLException, URISyntaxException {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/related_badmappingbasecolnull.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("The mapping table mapping1 failed test base_id notnull. expected [1] but found [0]");
+        tests.mapping_tables_schema();
+    }
+
+    /**
+     * Verifies that the test fails if the mapping table has the wrong
+     * related_id column nullability.
+     *
+     * @throws IOException
+     * @throws SQLException
+     * @throws URISyntaxException
+     */
+    @Test
+    public void relatedTableInvalidMappingTableSchemaRelatedColNull() throws IOException, SQLException, URISyntaxException {
+        URL gpkgUrl = ClassLoader.getSystemResource("gpkg/related_badmappingrelatedcolnull.gpkg");
+        File dataFile = new File(gpkgUrl.toURI());
+        dataFile.setWritable(false);
+        when(suite.getAttribute(SuiteAttribute.TEST_SUBJ_FILE.getName())).thenReturn(dataFile);
+        RelatedTablesTests tests = new RelatedTablesTests();
+        tests.initCommonFixture(testContext);
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("The mapping table mapping1 failed test related_id notnull. expected [1] but found [0]");
+        tests.mapping_tables_schema();
+    }
+
     // TODO: bad default values
     // TODO: bad primary key
     // TODO: bad unique key constraints
@@ -799,6 +840,7 @@ public class VerifyRelatedTablesTests {
     }
 
     // TODO: multi-table version
+
     /**
      * Verifies that the test fails if the related values do not correlate.
      *
@@ -838,6 +880,7 @@ public class VerifyRelatedTablesTests {
     }
 
     // TODO: multi-table version
+
     /**
      * Verifies that the test fails if the related values do not correlate.
      *

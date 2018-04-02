@@ -372,7 +372,7 @@ public class RelatedTablesTests extends CommonFixture {
                     passFlag |= 1;
                 } else if ("related_id".equals(name)) {
                     assertEquals(resultSet.getString("type"), "INTEGER", ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_COLUMN_INVALID, mappingTable, "related_id type"));
-                    assertTrue(resultSet.getInt("notnull") == 1, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_COLUMN_INVALID, mappingTable, "related_id notnull"));
+                    assertEquals(resultSet.getInt("notnull"), 1, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_COLUMN_INVALID, mappingTable, "related_id notnull"));
                     assertEquals(resultSet.getString("dflt_value"), null, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_COLUMN_INVALID, mappingTable, "related_id default value"));
                     assertEquals(resultSet.getInt("pk"), 0, ErrorMessage.format(ErrorMessageKeys.RELATED_TABLES_MAPPING_COLUMN_INVALID, mappingTable, "related_id primary key"));
                     // TODO: unique key constraints
