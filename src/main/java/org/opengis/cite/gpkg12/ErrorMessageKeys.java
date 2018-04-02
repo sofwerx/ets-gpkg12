@@ -110,7 +110,8 @@ public class ErrorMessageKeys {
     public static final String TILE_ANCILLARY_TABLE_REF_INVALID = "TileAncillaryTableRefInvalid";
     public static final String RELATED_TABLES_RELATIONS_COLUMN_INVALID = "RelatedTableRelationsColumnInvalid";
     public static final String RELATED_TABLES_MAPPING_COLUMN_INVALID = "RelatedTableMappingColumnInvalid";
-    public static final String RELATED_TABLES_RELATIONS_TABLE_NOT_IN_CONTENTS = "RelatedTableRelationsTableNotInContents";
+    public static final String RELATED_TABLES_RELATIONS_BASE_TABLE_NOT_IN_CONTENTS = "RelatedTableRelationsBaseTableNotInContents";
+    public static final String RELATED_TABLES_RELATIONS_RELATED_TABLE_NOT_IN_CONTENTS = "RelatedTableRelationsRelatedTableNotInContents";
     public static final String RELATED_TABLES_MAPPING_BASE_ROW_INVALID = "RelatedTableMappingBaseRowInvalid";
     public static final String RELATED_TABLES_MAPPING_RELATED_ROW_INVALID = "RelatedTableMappingRelatedRowInvalid";
     public static final String RELATED_TABLES_ATTRIBUTES_NO_PRIMARY_KEY = "RelatedTablesAttributesNoPrimaryKey";
@@ -119,4 +120,5 @@ public class ErrorMessageKeys {
     public static final String RELATED_TABLES_EXTENSION_ROWS_MISSING = "RelatedTablesExtensionRowsMissing";
     public static final String RELATED_TABLES_NOT_PRIMARY_KEY = "RelatedTableNotPrimaryKey";
     public static final String RELATED_TABLES_SIMPLE_ATTR_COLUMN_INVALID = "RelatedTableSimpleAttrColumnInvalid";
+    public static final String RELATED_TABLES_RELATION_NAME_INVALID = "RelatedTableRelationNameInvalid";
 }
